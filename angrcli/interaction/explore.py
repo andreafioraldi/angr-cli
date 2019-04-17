@@ -32,6 +32,21 @@ class ExploreInteractive(Cmd, object):
             self.simgr.stashes["deferred"] = []
         self.gui_cb = gui_callback_object
 
+        self._aliases = {
+            "s": self.do_step,
+            "q": self.do_quit,
+            "r": self.do_run,
+            "p": self.do_pick
+        }
+
+    def default(self, line):
+        """Handle aliases"""
+        cmd, args, line = self.parseline(line)
+        if cmd in self._aliases:
+            return self._aliases[cmd](args)
+        else:
+            print("No command or alias '%s', use 'help' for list of available commands" % cmd)
+
     @property
     def state(self):
         """
@@ -46,10 +61,6 @@ class ExploreInteractive(Cmd, object):
     def do_quit(self, args):
         """Quits the cli."""
         print(red("Exiting cmd-loop"))
-        return True
-    
-    def do_q(self, args):
-        self.do_quit(args)
         return True
 
     def do_print(self, arg):
@@ -84,12 +95,6 @@ class ExploreInteractive(Cmd, object):
             for idx, state in enumerate(self.simgr.active):
                 print(state.context_view.pstr_branch_info(idx))
     
-    def do_s(self, args):
-        self.do_step(args)
-
-    def do_s(self, args):
-        self.do_step(args)
-
     def do_run(self, args):
         if len(self.simgr.active) > 1 and args:
             self.do_pick(args)
@@ -109,10 +114,6 @@ class ExploreInteractive(Cmd, object):
                 print(red("Other side of last branch has been added to {}".format(self.simgr)))
                 self.simgr.stashes["active"].append(self.simgr.stashes["deferred"].pop())
 
-    def do_r(self, args):
-        self.do_run(args)
-
-
     def do_pick(self, arg):
         try:
             pick = int(arg)
@@ -127,9 +128,6 @@ class ExploreInteractive(Cmd, object):
         self.simgr.step()
         self._clearScreen()
         self.simgr.one_active.context_view.pprint()
-    
-    def do_p(self, args):
-        self.do_pick(args)
 
     def do_EOF(self, args):
         self.do_quit(args)
