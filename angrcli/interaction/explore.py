@@ -64,6 +64,11 @@ class ExploreInteractive(Cmd, object):
         return True
 
     def do_print(self, arg):
+        """
+        print [state_number]
+        Prints a state
+        state_number optionally specifies the state to print if multiple are available
+        """
         if not arg:
             arg = "0"
 
@@ -76,6 +81,10 @@ class ExploreInteractive(Cmd, object):
             self.gui_cb.update_ip(self.simgr.active[pick].addr)
 
     def do_stepi(self, args):
+        """
+        stepi
+        Steps one instruction
+        """
         if len(self.simgr.active) == 1:
             self.simgr.step(num_inst=1)
             self._clearScreen()
@@ -86,6 +95,10 @@ class ExploreInteractive(Cmd, object):
                 print(state.context_view.pstr_branch_info(idx))
 
     def do_step(self, args):
+        """
+        step
+        Steps the current state one basic block
+        """
         if len(self.simgr.active) == 1:
             self.simgr.step()
             self._clearScreen()
@@ -96,6 +109,11 @@ class ExploreInteractive(Cmd, object):
                 print(state.context_view.pstr_branch_info(idx))
     
     def do_run(self, args):
+        """
+        run [state_number]
+        Runs until a branch is encountered
+        state_number optionally picks a state if multiple are available
+        """
         if len(self.simgr.active) > 1 and args:
             self.do_pick(args)
         if len(self.simgr.active) == 1:
@@ -115,6 +133,10 @@ class ExploreInteractive(Cmd, object):
                 self.simgr.stashes["active"].append(self.simgr.stashes["deferred"].pop())
 
     def do_pick(self, arg):
+        """
+        pick <state_number>
+        Selects a state to continue if multiple are available, the other state is saved
+        """
         try:
             pick = int(arg)
             ip = self.simgr.active[pick].regs.ip
